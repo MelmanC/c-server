@@ -1,20 +1,24 @@
 #ifndef SERVER_H_
 #define SERVER_H_
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <pthread.h>
+#include <netinet/ip.h>
 #include <string.h>
-#include <regex.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <pthread.h>
 
-typedef struct server_s {
-    int port;
-    int socket;
-} server_t;
+// send data
+void send_200(int fd);
+void send_404(int fd);
+void send_echo(int fd, char *message);
+void send_agent(int fd, char *token);
+void send_file(int fd, char *token, char *directory);
+void send_post(int fd, char *token, char *directory);
 
-void display_file(FILE *file, int sock, long length, char *content, char *response);
 
 #endif /* SERVER_H_ */

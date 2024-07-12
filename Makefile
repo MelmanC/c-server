@@ -1,6 +1,6 @@
 SRC = \
 	./src/server.c \
-	./src/handle_file.c \
+	./src/send_data.c \
 
 OBJ = $(SRC:.c=.o)
 
@@ -30,12 +30,9 @@ clean:
 fclean: clean
 	rm -f $(OBJ)
 	rm -f $(NAME)
-	make clean -C $(DIRLIB)
 
-re: fclean compile all
+re: fclean all
 
-compile:
-	make -C $(DIRLIB)
 
 tests: all
 	gcc -o unit $(SRC) $(DIRT) $(CFLAGS) $(CPPFLAGS) $(CRITF)
@@ -43,4 +40,4 @@ tests: all
 debug: all
 	$(CC) -g $(SRC) $(LIB) $(NAMELIB) $(CPPFLAGS)
 
-.PHONY: all clean debug fclean re compile tests
+.PHONY: all clean debug fclean re tests
