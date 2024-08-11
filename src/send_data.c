@@ -7,8 +7,8 @@
  * @return void
  */
 void send_200(int fd) {
-	char *response = "HTTP/1.1 200 OK\r\n\r\n";
-	send(fd, response, strlen(response), 0);
+    char *response = "HTTP/1.1 200 OK\r\n\r\n";
+    send(fd, response, strlen(response), 0);
 }
 
 /**
@@ -17,8 +17,8 @@ void send_200(int fd) {
  * @return void
  */
 void send_404(int fd) {
-	char *response = "HTTP/1.1 404 Not Found\r\n\r\n";
-	send(fd, response, strlen(response), 0);
+    char *response = "HTTP/1.1 404 Not Found\r\n\r\n";
+    send(fd, response, strlen(response), 0);
 }
 
 /**
@@ -28,10 +28,10 @@ void send_404(int fd) {
  * @return void
  */
 void send_echo(int fd, char *message) {
-	char *response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s";
-	char *buffer = malloc(strlen(response) + strlen(message) + 1);
-	sprintf(buffer, response, strlen(message), message);
-	send(fd, buffer, strlen(buffer), 0);
+    char *response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s";
+    char *buffer = malloc(strlen(response) + strlen(message) + 1);
+    sprintf(buffer, response, strlen(message), message);
+    send(fd, buffer, strlen(buffer), 0);
 }
 
 /**
@@ -44,7 +44,7 @@ void send_agent(int fd, char *token) {
         token = strtok(NULL, "\r\n");
         if (strncmp(token, "User-Agent:", 11) == 0) {
             token = token + 12;
-			send_echo(fd, token);
+            send_echo(fd, token);
             break;
         }
     }
@@ -56,26 +56,26 @@ void send_agent(int fd, char *token) {
  * @return void
  */
 void send_file(int fd, char *token, char *directory) {
-	FILE *file;
-	struct stat st = {0};
-	char *response = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s";
-	char *buffer = NULL;
-	char *buff = NULL;
+    FILE *file;
+    struct stat st = {0};
+    char *response = "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: %d\r\n\r\n%s";
+    char *buffer = NULL;
+    char *buff = NULL;
 
-	strcat(directory, token);
-	stat(directory, &st);
+    strcat(directory, token);
+    stat(directory, &st);
     buff = malloc(sizeof(char) * st.st_size + 1);
     file = fopen(directory, "r");
-	if (file == NULL) {
-		send_404(fd);	
-		return;
-	}
+    if (file == NULL) {
+        send_404(fd);
+        return;
+    }
     fread(buff, 1, st.st_size, file);
     buff[st.st_size] = '\0';
     fclose(file);
-	buffer = malloc(strlen(response) + st.st_size + 1);
-	sprintf(buffer, response, st.st_size, buff);
-	send(fd, buffer, strlen(buffer), 0);
+    buffer = malloc(strlen(response) + st.st_size + 1);
+    sprintf(buffer, response, st.st_size, buff);
+    send(fd, buffer, strlen(buffer), 0);
 }
 
 /**
@@ -86,21 +86,21 @@ void send_file(int fd, char *token, char *directory) {
  * @return void
  */
 void send_post(int fd, char *token, char *directory) {
-	FILE *file;
-	char *response = "HTTP/1.1 201 Created\r\n\r\n";
-	char *lastline = NULL;
+    FILE *file;
+    char *response = "HTTP/1.1 201 Created\r\n\r\n";
+    char *lastline = NULL;
 
-	strcat(directory, token);
-	file = fopen(directory, "w");
-	if (file == NULL) {
-		send_404(fd);
-		return;
-	}
-	while (token != NULL) {
-        lastline = token;
-		token = strtok(NULL, "\r\n");
+    strcat(directory, token);
+    file = fopen(directory, "w");
+    if (file == NULL) {
+        send_404(fd);
+        return;
     }
-	fwrite(lastline, 1, strlen(lastline), file);
-	fclose(file);
-	send(fd, response, strlen(response), 0);
+    while (token != NULL) {
+        lastline = token;
+        token = strtok(NULL, "\r\n");
+    }
+    fwrite(lastline, 1, strlen(lastline), file);
+    fclose(file);
+    send(fd, response, strlen(response), 0);
 }
